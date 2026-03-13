@@ -50,6 +50,11 @@ public class AccountService {
         return mapToResponse(saved);
     }
 
+    public AccountResponseDto getAccount(UUID accountId) {
+        Account account = getOriginalAccount(accountId);
+        return mapToResponse(account);
+    }
+
     private Account getOriginalAccount(UUID accountId) {
         return accountRepository.findById(accountId)
                 .orElseThrow(() -> new RuntimeException("Account not found: " + accountId));

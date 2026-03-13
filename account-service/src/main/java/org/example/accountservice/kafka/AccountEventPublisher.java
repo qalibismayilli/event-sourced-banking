@@ -1,27 +1,23 @@
 package org.example.accountservice.kafka;
 
-import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
-import lombok.experimental.FieldDefaults;
+import org.example.accountservice.config.KafkaConfig;
 import org.example.accountservice.event.AccountClosedEvent;
 import org.example.accountservice.event.AccountCreatedEvent;
 import org.example.accountservice.event.AccountFrozenEvent;
 import org.example.accountservice.model.Account;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
+import tools.jackson.databind.ObjectMapper;
 
 import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
-@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class AccountEventPublisher {
 
-    KafkaTemplate<String, Object> kafkaTemplate;
-
-    static final String ACCOUNT_CREATED_TOPIC = "account-created-events";
-    static final String ACCOUNT_CLOSED_TOPIC = "account-closed-events";
-    static final String ACCOUNT_FROZEN_TOPIC = "account-frozen-events";
+    private final KafkaTemplate<String, Object> kafkaTemplate;
+    private final ObjectMapper objectMapper;
 
     public void publishAccountCreatedEvent(Account account) {
         AccountCreatedEvent event = new AccountCreatedEvent(
@@ -33,7 +29,11 @@ public class AccountEventPublisher {
                 account.getMonthlyLimit(),
                 account.getCreatedDate()
         );
-        kafkaTemplate.send(ACCOUNT_CREATED_TOPIC, account.getAccountId().toString(), event);
+        kafkaTemplate.send(
+                KafkaConfig.ACCOUNT_CREATED_TOPIC,
+                account.getAccountId().toString(),
+                objectMapper.writeValueAsString(event)
+        );
     }
 
     public void publishAccountClosedEvent(Account account) {
@@ -41,7 +41,11 @@ public class AccountEventPublisher {
                 account.getAccountId(),
                 LocalDateTime.now()
         );
-        kafkaTemplate.send(ACCOUNT_CLOSED_TOPIC, account.getAccountId().toString(), event);
+        kafkaTemplate.send(
+                KafkaConfig.ACCOUNT_CLOSED_TOPIC,
+                account.getAccountId().toString(),
+                objectMapper.writeValueAsString(event)
+        );
     }
 
     public void publishAccountFrozenEvent(Account account) {
@@ -49,6 +53,10 @@ public class AccountEventPublisher {
                 account.getAccountId(),
                 LocalDateTime.now()
         );
-        kafkaTemplate.send(ACCOUNT_FROZEN_TOPIC, account.getAccountId().toString(), event);
+        kafkaTemplate.send(
+                KafkaConfig.ACCOUNT_FROZEN_TOPIC,
+                account.getAccountId().toString(),
+                objectMapper.writeValueAsString(event)
+        );
     }
 }
