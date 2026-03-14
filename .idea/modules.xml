@@ -2,6 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/account-service.main.iml" filepath="$PROJECT_DIR$/.idea/modules/account-service.main.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/event-sourced-banking.iml" filepath="$PROJECT_DIR$/.idea/event-sourced-banking.iml" />
     </modules>
   </component>

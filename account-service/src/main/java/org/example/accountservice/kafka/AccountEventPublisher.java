@@ -16,7 +16,7 @@ import java.time.LocalDateTime;
 @RequiredArgsConstructor
 public class AccountEventPublisher {
 
-    private final KafkaTemplate<String, Object> kafkaTemplate;
+    private final KafkaTemplate<String, String> kafkaTemplate;
     private final ObjectMapper objectMapper;
 
     public void publishAccountCreatedEvent(Account account) {

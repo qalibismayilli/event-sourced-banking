@@ -27,6 +27,8 @@ public class AccountService {
                 .ownerName(request.getOwnerName())
                 .currency(request.getCurrency())
                 .monthlyLimit(request.getLimit() != null ? request.getLimit() : new BigDecimal("10000"))
+                .balance(BigDecimal.ZERO)
+                .status(AccountStatus.ACTIVE)
                 .build();
 
         Account saved = accountRepository.save(account);

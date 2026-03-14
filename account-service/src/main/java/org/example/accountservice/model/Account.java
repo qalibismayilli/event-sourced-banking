@@ -46,7 +46,7 @@ public class Account {
     Currency currency;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "VARCHAR DEFAULT 'ACTIVE' CHECK (status IN ('ACTIVE', 'CLOSED', 'FROZEN'))")
     AccountStatus status;
 
     @Column(name = "monthly_limit", columnDefinition = "NUMERIC DEFAULT 10000")
