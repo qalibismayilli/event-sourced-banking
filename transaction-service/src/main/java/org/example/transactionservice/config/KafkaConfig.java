@@ -16,7 +16,7 @@ import java.util.Map;
 @Configuration
 public class KafkaConfig {
 
-    public static final String TRANSACTION_EXECUTED_TOPIC = "transaction-executed-events";
+    public static final String TRANSACTION_EXECUTED_TOPIC = "transaction-executed-events-topic";
 
     private Map<String,Object> producerConfigs(){
         Map<String,Object> config =new HashMap<>();

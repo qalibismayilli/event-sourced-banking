@@ -7,6 +7,7 @@ import org.example.transactionservice.dto.TransactionRequestDto;
 import org.example.transactionservice.dto.TransactionResponseDto;
 import org.example.transactionservice.kafka.TransactionEventPublisher;
 import org.example.transactionservice.model.Transaction;
+import org.example.transactionservice.model.TransactionStatus;
 import org.example.transactionservice.model.TransactionType;
 import org.example.transactionservice.repository.TransactionRepository;
 import org.springframework.stereotype.Service;
@@ -24,6 +25,7 @@ public class TransactionService {
                 .accountId(request.getAccountId())
                 .amount(request.getAmount())
                 .type(TransactionType.DEPOSIT)
+                .status(TransactionStatus.SUCCESS)
                 .description(request.getDescription())
                 .build();
 
@@ -38,6 +40,7 @@ public class TransactionService {
                 .amount(request.getAmount())
                 .type(TransactionType.WITHDRAW)
                 .description(request.getDescription())
+                .status(TransactionStatus.SUCCESS)
                 .build();
 
         Transaction saved = transactionRepository.save(transaction);
@@ -55,6 +58,7 @@ public class TransactionService {
                 .toAccountId(request.getToAccountId())
                 .amount(request.getAmount())
                 .type(TransactionType.TRANSFER)
+                .status(TransactionStatus.SUCCESS)
                 .description(request.getDescription())
                 .build();
 

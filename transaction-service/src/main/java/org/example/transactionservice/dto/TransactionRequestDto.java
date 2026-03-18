@@ -22,8 +22,5 @@ public class TransactionRequestDto {
     @DecimalMin(value = "0.01", message = "Amount must be greater than 0")
     BigDecimal amount;
 
-    @NotNull(message = "Transaction type cannot be null")
-    TransactionType type;
-
     String description;
 }
