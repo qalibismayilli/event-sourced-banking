@@ -22,11 +22,7 @@ public class TransactionEventConsumer {
 
     @KafkaListener(topics = "transaction-executed-events-topic", groupId = "account-group")
     public void handleTransactionExecuted(String message) {
-        try {
             TransactionExecutedEvent event = objectMapper.readValue(message, TransactionExecutedEvent.class);
             accountService.updateBalance(event);
-        } catch (JsonProcessingException e) {
-            log.error("Failed to deserialize TransactionExecutedEvent: {}", message, e);
-        }
     }
 }
