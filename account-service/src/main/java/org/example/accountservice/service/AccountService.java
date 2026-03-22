@@ -2,6 +2,8 @@ package org.example.accountservice.service;
 
 import org.example.accountservice.dto.AccountRequestDto;
 import org.example.accountservice.dto.AccountResponseDto;
+import org.example.accountservice.handler.consume_events.TransactionExecutedEvent;
+import org.example.accountservice.handler.consume_events.TransactionType;
 import org.example.accountservice.kafka.AccountEventPublisher;
 import org.example.accountservice.model.Account;
 import org.example.accountservice.model.AccountStatus;
@@ -55,6 +57,31 @@ public class AccountService {
     public AccountResponseDto getAccount(UUID accountId) {
         Account account = getOriginalAccount(accountId);
         return mapToResponse(account);
+    }
+
+    public AccountResponseDto updateBalance(TransactionExecutedEvent event) {
+        Account account = getOriginalAccount(event.getAccountId());
+
+        TransactionType type = event.getType();
+        switch (type) {
+            case DEPOSIT:
+                account.setBalance(account.getBalance().add(event.getAmount()));
+                accountRepository.save(account);
+                return mapToResponse(account);
+            case WITHDRAW:
+                account.setBalance(account.getBalance().subtract(event.getAmount()));
+                accountRepository.save(account);
+                return mapToResponse(account);
+            case TRANSFER:
+                Account toAccount = getOriginalAccount(event.getToAccountId());
+                account.setBalance(account.getBalance().subtract(event.getAmount()));
+                toAccount.setBalance(toAccount.getBalance().add(event.getAmount()));
+                accountRepository.save(account);
+                accountRepository.save(toAccount);
+                return mapToResponse(account);
+            default:
+                throw new RuntimeException("Unknown transaction type: " + type);
+        }
     }
 
     private Account getOriginalAccount(UUID accountId) {
