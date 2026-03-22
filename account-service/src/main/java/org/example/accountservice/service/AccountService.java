@@ -1,5 +1,6 @@
 package org.example.accountservice.service;
 
+import jakarta.validation.constraints.NotNull;
 import org.example.accountservice.dto.AccountRequestDto;
 import org.example.accountservice.dto.AccountResponseDto;
 import org.example.accountservice.handler.consume_events.TransactionExecutedEvent;
@@ -9,6 +10,7 @@ import org.example.accountservice.model.Account;
 import org.example.accountservice.model.AccountStatus;
 import org.example.accountservice.repository.AccountRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.UUID;
@@ -59,7 +61,8 @@ public class AccountService {
         return mapToResponse(account);
     }
 
-    public AccountResponseDto updateBalance(TransactionExecutedEvent event) {
+    @Transactional
+    public AccountResponseDto updateBalance(@NotNull TransactionExecutedEvent event) {
         Account account = getOriginalAccount(event.getAccountId());
 
         TransactionType type = event.getType();
