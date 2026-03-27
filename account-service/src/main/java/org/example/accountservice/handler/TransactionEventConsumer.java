@@ -10,7 +10,6 @@ import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
 import tools.jackson.databind.ObjectMapper;
 
-
 @Component
 @RequiredArgsConstructor
 public class TransactionEventConsumer {

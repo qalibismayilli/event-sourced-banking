@@ -52,7 +52,6 @@ public class TransactionService {
         if (request.getToAccountId() == null) {
             throw new RuntimeException("toAccountId is required for TRANSFER transactions");
         }
-
         Transaction transaction = Transaction.builder()
                 .accountId(request.getAccountId())
                 .toAccountId(request.getToAccountId())
