@@ -10,6 +10,11 @@
         <module name="account-service.main" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="replay-service" target="17" />
+      <module name="replay-service.main" target="17" />
+      <module name="replay-service.test" target="17" />
+    </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
@@ -19,6 +24,9 @@
       <module name="notification-service" options="-parameters" />
       <module name="notification-service.main" options="-parameters" />
       <module name="notification-service.test" options="-parameters" />
+      <module name="replay-service" options="-parameters" />
+      <module name="replay-service.main" options="-parameters" />
+      <module name="replay-service.test" options="-parameters" />
       <module name="transaction-service" options="-parameters" />
       <module name="transaction-service.main" options="-parameters" />
       <module name="transaction-service.test" options="-parameters" />
