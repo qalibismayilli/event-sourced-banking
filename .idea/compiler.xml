@@ -10,11 +10,6 @@
         <module name="account-service.main" />
       </profile>
     </annotationProcessing>
-    <bytecodeTargetLevel>
-      <module name="replay-service" target="17" />
-      <module name="replay-service.main" target="17" />
-      <module name="replay-service.test" target="17" />
-    </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
