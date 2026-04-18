@@ -4,8 +4,49 @@
   <component name="GradleSettings">
     <option name="linkedExternalProjectsSettings">
       <GradleProjectSettings>
+        <compositeConfiguration>
+          <compositeBuild compositeDefinitionSource="SCRIPT">
+            <builds>
+              <build path="$PROJECT_DIR$/account-service" name="account-service">
+                <projects>
+                  <project path="$PROJECT_DIR$/account-service" />
+                </projects>
+              </build>
+              <build path="$PROJECT_DIR$/notification-service" name="notification-service">
+                <projects>
+                  <project path="$PROJECT_DIR$/notification-service" />
+                </projects>
+              </build>
+              <build path="$PROJECT_DIR$/replay-service" name="replay-service">
+                <projects>
+                  <project path="$PROJECT_DIR$/replay-service" />
+                </projects>
+              </build>
+              <build path="$PROJECT_DIR$/shared-events" name="shared-events">
+                <projects>
+                  <project path="$PROJECT_DIR$/shared-events" />
+                </projects>
+              </build>
+              <build path="$PROJECT_DIR$/transaction-service" name="transaction-service">
+                <projects>
+                  <project path="$PROJECT_DIR$/transaction-service" />
+                </projects>
+              </build>
+            </builds>
+          </compositeBuild>
+        </compositeConfiguration>
         <option name="externalProjectPath" value="$PROJECT_DIR$" />
         <option name="gradleJvm" value="#JAVA_HOME" />
+        <option name="modules">
+          <set>
+            <option value="$PROJECT_DIR$" />
+            <option value="$PROJECT_DIR$/account-service" />
+            <option value="$PROJECT_DIR$/notification-service" />
+            <option value="$PROJECT_DIR$/replay-service" />
+            <option value="$PROJECT_DIR$/shared-events" />
+            <option value="$PROJECT_DIR$/transaction-service" />
+          </set>
+        </option>
       </GradleProjectSettings>
       <GradleProjectSettings>
         <compositeConfiguration>

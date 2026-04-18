@@ -2,11 +2,7 @@
 <project version="4">
   <component name="ExternalStorageConfigurationManager" enabled="true" />
   <component name="FrameworkDetectionExcludesConfiguration">
-    <file type="web" url="file://$PROJECT_DIR$/account-service" />
-    <file type="web" url="file://$PROJECT_DIR$/notification-service" />
-    <file type="web" url="file://$PROJECT_DIR$/replay-service" />
-    <file type="web" url="file://$PROJECT_DIR$/shared-events" />
-    <file type="web" url="file://$PROJECT_DIR$/transaction-service" />
+    <file type="web" url="file://$PROJECT_DIR$" />
   </component>
   <component name="ProjectRootManager">
     <output url="file://$PROJECT_DIR$/out" />

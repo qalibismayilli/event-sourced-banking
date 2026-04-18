@@ -7,8 +7,6 @@ import org.example.transactionservice.dto.TransactionRequestDto;
 import org.example.transactionservice.dto.TransactionResponseDto;
 import org.example.transactionservice.kafka.TransactionEventPublisher;
 import org.example.transactionservice.model.Transaction;
-import org.example.transactionservice.model.TransactionStatus;
-import org.example.transactionservice.model.TransactionType;
 import org.example.transactionservice.repository.TransactionRepository;
 import org.springframework.stereotype.Service;
 

@@ -4,7 +4,6 @@ import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.experimental.FieldDefaults;
-import org.example.transactionservice.model.TransactionType;
 
 import java.math.BigDecimal;
 import java.util.UUID;

@@ -3,8 +3,6 @@ package org.example.transactionservice.dto;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.experimental.FieldDefaults;
-import org.example.transactionservice.model.TransactionStatus;
-import org.example.transactionservice.model.TransactionType;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;

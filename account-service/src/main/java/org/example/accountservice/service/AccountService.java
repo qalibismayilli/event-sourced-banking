@@ -3,8 +3,6 @@ package org.example.accountservice.service;
 import jakarta.validation.constraints.NotNull;
 import org.example.accountservice.dto.AccountRequestDto;
 import org.example.accountservice.dto.AccountResponseDto;
-import org.example.accountservice.handler.consume_events.TransactionExecutedEvent;
-import org.example.accountservice.handler.consume_events.TransactionType;
 import org.example.accountservice.kafka.AccountEventPublisher;
 import org.example.accountservice.model.Account;
 import org.example.accountservice.repository.AccountRepository;
@@ -62,10 +60,10 @@ public class AccountService {
     }
 
     @Transactional
-    public AccountResponseDto updateBalance(@NotNull TransactionExecutedEvent event) {
+    public AccountResponseDto updateBalance(@NotNull org.example.sharedevents.event.TransactionExecutedEvent event) {
         Account account = getOriginalAccount(event.getAccountId());
 
-        TransactionType type = event.getType();
+        org.example.sharedevents.util.TransactionType type = event.getType();
         switch (type) {
             case DEPOSIT:
                 account.setBalance(account.getBalance().add(event.getAmount()));

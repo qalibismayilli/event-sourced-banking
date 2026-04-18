@@ -3,7 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/account-service.main.iml" filepath="$PROJECT_DIR$/.idea/modules/account-service.main.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/event-sourced-banking.iml" filepath="$PROJECT_DIR$/.idea/event-sourced-banking.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/shared-events.main.iml" filepath="$PROJECT_DIR$/.idea/modules/shared-events.main.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/transaction-service.main.iml" filepath="$PROJECT_DIR$/.idea/modules/transaction-service.main.iml" />
     </modules>
   </component>

@@ -3,6 +3,8 @@ package org.example.transactionservice.model;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import org.example.sharedevents.util.TransactionStatus;
+import org.example.sharedevents.util.TransactionType;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UuidGenerator;
 
