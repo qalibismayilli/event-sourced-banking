@@ -2,13 +2,12 @@ package org.example.accountservice.kafka;
 
 import lombok.RequiredArgsConstructor;
 import org.example.accountservice.config.KafkaConfig;
-import org.example.accountservice.event.AccountClosedEvent;
-import org.example.accountservice.event.AccountCreatedEvent;
-import org.example.accountservice.event.AccountFrozenEvent;
 import org.example.accountservice.model.Account;
+import org.example.sharedevents.event.AccountClosedEvent;
+import org.example.sharedevents.event.AccountCreatedEvent;
+import org.example.sharedevents.event.AccountFrozenEvent;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
-import tools.jackson.databind.ObjectMapper;
 
 import java.time.LocalDateTime;
 
@@ -16,8 +15,7 @@ import java.time.LocalDateTime;
 @RequiredArgsConstructor
 public class AccountEventPublisher {
 
-    private final KafkaTemplate<String, String> kafkaTemplate;
-    private final ObjectMapper objectMapper;
+    private final KafkaTemplate<String, Object> kafkaTemplate;
 
     public void publishAccountCreatedEvent(Account account) {
         AccountCreatedEvent event = new AccountCreatedEvent(
@@ -32,7 +30,7 @@ public class AccountEventPublisher {
         kafkaTemplate.send(
                 KafkaConfig.ACCOUNT_CREATED_TOPIC,
                 account.getAccountId().toString(),
-                objectMapper.writeValueAsString(event)
+                event
         );
     }
 
@@ -44,7 +42,7 @@ public class AccountEventPublisher {
         kafkaTemplate.send(
                 KafkaConfig.ACCOUNT_CLOSED_TOPIC,
                 account.getAccountId().toString(),
-                objectMapper.writeValueAsString(event)
+                event
         );
     }
 
@@ -56,7 +54,7 @@ public class AccountEventPublisher {
         kafkaTemplate.send(
                 KafkaConfig.ACCOUNT_FROZEN_TOPIC,
                 account.getAccountId().toString(),
-                objectMapper.writeValueAsString(event)
+                event
         );
     }
 }

@@ -3,8 +3,9 @@ package org.example.accountservice.dto;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.experimental.FieldDefaults;
-import org.example.accountservice.model.AccountStatus;
-import org.example.accountservice.model.Currency;
+import org.example.sharedevents.util.AccountStatus;
+import org.example.sharedevents.util.Currency;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;

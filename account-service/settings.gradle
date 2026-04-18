@@ -1,1 +1,4 @@
 rootProject.name = 'account-service'
+
+includeBuild '../shared-events'
+

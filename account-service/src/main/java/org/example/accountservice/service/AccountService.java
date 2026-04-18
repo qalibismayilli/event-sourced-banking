@@ -7,8 +7,8 @@ import org.example.accountservice.handler.consume_events.TransactionExecutedEven
 import org.example.accountservice.handler.consume_events.TransactionType;
 import org.example.accountservice.kafka.AccountEventPublisher;
 import org.example.accountservice.model.Account;
-import org.example.accountservice.model.AccountStatus;
 import org.example.accountservice.repository.AccountRepository;
+import org.example.sharedevents.util.AccountStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

@@ -5,7 +5,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.experimental.FieldDefaults;
-import org.example.accountservice.model.Currency;
+import org.example.sharedevents.util.Currency;
 
 import java.math.BigDecimal;
 

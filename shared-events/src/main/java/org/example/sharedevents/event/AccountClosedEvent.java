@@ -1,4 +1,4 @@
-package org.example.accountservice.event;
+package org.example.sharedevents.event;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
