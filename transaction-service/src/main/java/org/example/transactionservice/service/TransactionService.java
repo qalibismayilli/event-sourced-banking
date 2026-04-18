@@ -3,6 +3,8 @@ package org.example.transactionservice.service;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.example.sharedevents.util.TransactionStatus;
+import org.example.sharedevents.util.TransactionType;
 import org.example.transactionservice.dto.TransactionRequestDto;
 import org.example.transactionservice.dto.TransactionResponseDto;
 import org.example.transactionservice.kafka.TransactionEventPublisher;

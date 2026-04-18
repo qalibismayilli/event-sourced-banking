@@ -1,1 +1,4 @@
 rootProject.name = 'replay-service'
+
+includeBuild '../shared-events'
+

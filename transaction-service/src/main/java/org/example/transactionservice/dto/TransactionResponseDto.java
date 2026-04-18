@@ -3,6 +3,8 @@ package org.example.transactionservice.dto;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.experimental.FieldDefaults;
+import org.example.sharedevents.util.TransactionStatus;
+import org.example.sharedevents.util.TransactionType;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;

@@ -6,9 +6,9 @@ import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.common.TopicPartition;
 import org.example.replayservice.dto.AccountStateResponseDto;
-import org.example.replayservice.event.TransactionExecutedEvent;
 import org.example.replayservice.model.AccountSnapshot;
 import org.example.replayservice.repository.AccountSnapshotRepository;
+import org.example.sharedevents.event.TransactionExecutedEvent;
 import org.springframework.stereotype.Service;
 import tools.jackson.databind.ObjectMapper;
 
@@ -31,7 +31,7 @@ public class ReplayService {
     private static final int SNAPSHOT_INTERVAL = 100;
 
     // Kafka-dan event gəlir, snapshot yoxlanılır
-    public void processEvent(TransactionExecutedEvent event, int partition, long offset) {
+    public void processEvent(org.example.sharedevents.event.TransactionExecutedEvent event, int partition, long offset) {
         // Snapshot lazımdırmı yoxla
         snapshotRepository.findByAccountId((event.getAccountId())).ifPresentOrElse(
                 snapshot -> {

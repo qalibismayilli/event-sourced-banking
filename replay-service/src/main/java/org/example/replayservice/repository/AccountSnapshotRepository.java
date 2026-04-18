@@ -11,6 +11,8 @@ public interface AccountSnapshotRepository extends JpaRepository<AccountSnapshot
     Optional<AccountSnapshot> findByAccountId(UUID accountId);
 
 
-    Optional<AccountSnapshot> findTopByAccountIdAndSnapshotTimeBeforeOrderBySnapshotTimeDesc(UUID accountId, LocalDateTime snapshotTime);
+    Optional<AccountSnapshot> findTopByAccountIdAndSnapshotTimeBeforeOrderBySnapshotTimeDesc(
+            UUID accountId, LocalDateTime snapshotTime
+    );
 
 }
