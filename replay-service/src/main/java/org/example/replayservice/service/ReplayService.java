@@ -24,7 +24,7 @@ import java.util.UUID;
 public class ReplayService {
 
     private final AccountSnapshotRepository snapshotRepository;
-    private final KafkaConsumer<String, String> kafkaConsumer;
+    private final KafkaConsumer<String, Object> kafkaConsumer;
     private final ObjectMapper objectMapper;
 
     private static final String TOPIC = "transaction-executed-events-topic";
@@ -69,11 +69,11 @@ public class ReplayService {
         int eventsReplayed = 0;
 
         while (true) {
-            ConsumerRecords<String, String> records = kafkaConsumer.poll(Duration.ofMillis(500));
+            ConsumerRecords<String, Object> records = kafkaConsumer.poll(Duration.ofMillis(500));
             if (records.isEmpty()) break;
 
-            for (ConsumerRecord<String, String> record : records) {
-                TransactionExecutedEvent event = objectMapper.readValue(record.value(), TransactionExecutedEvent.class);
+            for (ConsumerRecord<String, Object> record : records) {
+                TransactionExecutedEvent event = (TransactionExecutedEvent) record.value();
 
                 if (!event.getAccountId().equals(accountId)) continue;
                 if (event.getCreatedDate().isAfter(at)) break;
@@ -130,14 +130,13 @@ public class ReplayService {
         BigDecimal balance = snapshot.getBalance();
 
         while (true) {
-            ConsumerRecords<String, String> records = kafkaConsumer.poll(Duration.ofMillis(500));
+            ConsumerRecords<String, Object> records = kafkaConsumer.poll(Duration.ofMillis(500));
             if (records.isEmpty()) break;
 
-            for (ConsumerRecord<String, String> record : records) {
+            for (ConsumerRecord<String, Object> record : records) {
                 if (record.offset() >= currentOffset) break;
 
-                TransactionExecutedEvent event = objectMapper.readValue(record.value(), TransactionExecutedEvent.class);
-
+                TransactionExecutedEvent event = (TransactionExecutedEvent) record.value();
                 if (event.getAccountId().equals(accountId)) {
                     balance = applyEvent(balance, event, accountId);
                 }
