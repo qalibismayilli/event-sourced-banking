@@ -10,7 +10,6 @@ import org.example.replayservice.model.AccountSnapshot;
 import org.example.replayservice.repository.AccountSnapshotRepository;
 import org.example.sharedevents.event.TransactionExecutedEvent;
 import org.springframework.stereotype.Service;
-import tools.jackson.databind.ObjectMapper;
 
 import java.math.BigDecimal;
 import java.time.Duration;
@@ -24,15 +23,12 @@ import java.util.UUID;
 public class ReplayService {
 
     private final AccountSnapshotRepository snapshotRepository;
-    private final KafkaConsumer<String, Object> kafkaConsumer;
-    private final ObjectMapper objectMapper;
+    private final KafkaConsumer<String, TransactionExecutedEvent> kafkaConsumer;
 
     private static final String TOPIC = "transaction-executed-events-topic";
     private static final int SNAPSHOT_INTERVAL = 100;
 
-    // Kafka-dan event gəlir, snapshot yoxlanılır
-    public void processEvent(org.example.sharedevents.event.TransactionExecutedEvent event, int partition, long offset) {
-        // Snapshot lazımdırmı yoxla
+    public void processEvent(TransactionExecutedEvent event, int partition, long offset) {
         snapshotRepository.findByAccountId((event.getAccountId())).ifPresentOrElse(
                 snapshot -> {
                     if (offset - snapshot.getOffset() >= SNAPSHOT_INTERVAL) {
@@ -43,13 +39,10 @@ public class ReplayService {
         );
     }
 
-    // Time-travel API
-    public AccountStateResponseDto replayAt(UUID accountId, LocalDateTime at) {
-        // 1. Ən yaxın snapshot-u tap
+    public AccountStateResponseDto replayAt(UUID accountId, LocalDateTime date) {
         Optional<AccountSnapshot> snapshot = snapshotRepository
-                .findTopByAccountIdAndSnapshotTimeBeforeOrderBySnapshotTimeDesc(accountId, at);
+                .findTopByAccountIdAndSnapshotTimeBeforeOrderBySnapshotTimeDesc(accountId, date);
 
-        // 2. Kafka-dan replay et
         TopicPartition topicPartition;
         long startOffset;
 
@@ -69,14 +62,14 @@ public class ReplayService {
         int eventsReplayed = 0;
 
         while (true) {
-            ConsumerRecords<String, Object> records = kafkaConsumer.poll(Duration.ofMillis(500));
+            ConsumerRecords<String, TransactionExecutedEvent> records = kafkaConsumer.poll(Duration.ofMillis(500));
             if (records.isEmpty()) break;
 
-            for (ConsumerRecord<String, Object> record : records) {
-                TransactionExecutedEvent event = (TransactionExecutedEvent) record.value();
+            for (ConsumerRecord<String, TransactionExecutedEvent> record : records) {
+                TransactionExecutedEvent event = record.value();
 
                 if (!event.getAccountId().equals(accountId)) continue;
-                if (event.getCreatedDate().isAfter(at)) break;
+                if (event.getCreatedDate().isAfter(date)) break;
 
                 balance = applyEvent(balance, event, accountId);
                 eventsReplayed++;
@@ -89,7 +82,7 @@ public class ReplayService {
                 .snapshotUsed(snapshot.isPresent())
                 .snapshotOffset(snapshot.map(AccountSnapshot::getOffset).orElse(0L))
                 .eventsReplayed(eventsReplayed)
-                .replayedAt(at)
+                .replayedAt(date)
                 .build();
     }
 
@@ -122,21 +115,19 @@ public class ReplayService {
     }
 
     private BigDecimal calculateBalance(UUID accountId, AccountSnapshot snapshot, long currentOffset) {
-        // Snapshot-dan bu ana qədər olan eventləri replay et
         TopicPartition topicPartition = new TopicPartition(TOPIC, snapshot.getPartition());
         kafkaConsumer.assign(List.of(topicPartition));
         kafkaConsumer.seek(topicPartition, snapshot.getOffset());
-
         BigDecimal balance = snapshot.getBalance();
 
         while (true) {
-            ConsumerRecords<String, Object> records = kafkaConsumer.poll(Duration.ofMillis(500));
+            ConsumerRecords<String, TransactionExecutedEvent> records = kafkaConsumer.poll(Duration.ofMillis(500));
             if (records.isEmpty()) break;
 
-            for (ConsumerRecord<String, Object> record : records) {
+            for (ConsumerRecord<String, TransactionExecutedEvent> record : records) {
                 if (record.offset() >= currentOffset) break;
 
-                TransactionExecutedEvent event = (TransactionExecutedEvent) record.value();
+                TransactionExecutedEvent event = record.value();
                 if (event.getAccountId().equals(accountId)) {
                     balance = applyEvent(balance, event, accountId);
                 }

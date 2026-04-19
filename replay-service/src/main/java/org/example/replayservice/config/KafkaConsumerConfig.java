@@ -3,6 +3,7 @@ package org.example.replayservice.config;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.common.serialization.StringDeserializer;
+import org.example.sharedevents.event.TransactionExecutedEvent;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
@@ -42,7 +43,7 @@ public class KafkaConsumerConfig {
     }
 
     @Bean
-    public KafkaConsumer<String, Object> kafkaConsumer() {
+    public KafkaConsumer<String, TransactionExecutedEvent> kafkaConsumer() {
         return new KafkaConsumer<>(consumerConfigs());
     }
 
