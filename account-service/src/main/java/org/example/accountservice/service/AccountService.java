@@ -8,7 +8,6 @@ import org.example.accountservice.model.Account;
 import org.example.accountservice.repository.AccountRepository;
 import org.example.sharedevents.event.TransactionExecutedEvent;
 import org.example.sharedevents.util.AccountStatus;
-import org.example.sharedevents.util.TransactionType;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
