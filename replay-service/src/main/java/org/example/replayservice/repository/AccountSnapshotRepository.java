@@ -3,6 +3,7 @@ package org.example.replayservice.repository;
 import org.example.replayservice.model.AccountSnapshot;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -13,12 +14,15 @@ public interface AccountSnapshotRepository extends JpaRepository<AccountSnapshot
 
 
     @Query(value = """
-            select * from 
+            select *from account_snapshots
+            where account_id = :accountId and snapshot_time <= :snapshotTime
+            order by snapshot_time desc
+            limit 1
             """,
             nativeQuery = true)
     Optional<AccountSnapshot> findTopByAccountIdAndSnapshotTimeBeforeOrderBySnapshotTimeDesc(
-            UUID accountId,
-            LocalDateTime snapshotTime
+            @Param("accountId") UUID accountId,
+            @Param("snapshotTime") LocalDateTime snapshotTime
     );
 
 }
