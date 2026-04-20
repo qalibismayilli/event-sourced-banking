@@ -39,19 +39,19 @@ public class Account {
     @Column(name = "owner_name")
     String ownerName;
 
-    @Column(nullable = false, columnDefinition = "NUMERIC DEFAULT 0 CHECK (balance >= 0)")
+    @Column(nullable = false)
     @Min(value = 0, message = "Balance cannot be negative")
-    BigDecimal balance;
+    BigDecimal balance = BigDecimal.ZERO;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     Currency currency;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false, columnDefinition = "VARCHAR DEFAULT 'ACTIVE' CHECK (status IN ('ACTIVE', 'CLOSED', 'FROZEN'))")
-    AccountStatus status;
+    @Column(nullable = false)
+    AccountStatus status = AccountStatus.ACTIVE;
 
-    @Column(name = "monthly_limit", columnDefinition = "NUMERIC DEFAULT 10000")
-    BigDecimal monthlyLimit;
+    @Column(name = "monthly_limit")
+    BigDecimal monthlyLimit = BigDecimal.valueOf(10000);
 
 }

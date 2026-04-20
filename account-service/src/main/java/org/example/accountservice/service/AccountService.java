@@ -54,6 +54,14 @@ public class AccountService {
         return mapToResponse(saved);
     }
 
+    public AccountResponseDto activateAccount(UUID accountId) {
+        Account account = getOriginalAccount(accountId);
+        account.setStatus(AccountStatus.ACTIVE);
+        Account saved = accountRepository.save(account);
+        accountEventPublisher.publishAccountFrozenEvent(saved);
+        return mapToResponse(saved);
+    }
+
     public AccountResponseDto getAccount(UUID accountId) {
         Account account = getOriginalAccount(accountId);
         return mapToResponse(account);

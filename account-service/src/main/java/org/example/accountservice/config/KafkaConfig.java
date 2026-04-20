@@ -41,6 +41,7 @@ public class KafkaConfig {
         config.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JacksonJsonDeserializer.class);
         config.put(ConsumerConfig.GROUP_ID_CONFIG, "account-group");
         config.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
+        config.put(JacksonJsonDeserializer.TRUSTED_PACKAGES, "org.example.sharedevents.*");
         return config;
     }
 

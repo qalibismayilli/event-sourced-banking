@@ -42,4 +42,9 @@ public class AccountController {
     public ResponseEntity<AccountResponseDto> freezeAccount(@PathVariable UUID accountId) {
         return ResponseEntity.ok(accountService.freezeAccount(accountId));
     }
+
+    @PatchMapping("/{accountId}/activate")
+    public ResponseEntity<AccountResponseDto> activateAccount(@PathVariable UUID accountId) {
+        return ResponseEntity.ok(accountService.activateAccount(accountId));
+    }
 }

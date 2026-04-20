@@ -34,8 +34,8 @@ public class AccountSnapshot {
     @Column(nullable = false)
     Integer partition;
 
-    @Column(nullable = false)
-    Long offset;
+    @Column(name="event_offset", nullable = false)
+    Long eventOffset;
 
     @CreationTimestamp
     @Column(name = "snapshot_time", updatable = false)

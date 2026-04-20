@@ -45,7 +45,7 @@ public class ReplayService {
     public void processEvent(TransactionExecutedEvent event, int partition, long offset) {
         snapshotRepository.findByAccountId((event.getAccountId())).ifPresentOrElse(
                 snapshot -> {
-                    if (offset - snapshot.getOffset() >= SNAPSHOT_INTERVAL) {
+                    if (offset - snapshot.getEventOffset() >= SNAPSHOT_INTERVAL) {
                         takeSnapshot(event.getAccountId(), calculateBalance(event.getAccountId(), snapshot, offset), partition, offset);
                     }
                 },
@@ -64,7 +64,7 @@ public class ReplayService {
 
             if (snapshot.isPresent()) {
                 topicPartition = new TopicPartition(TOPIC, snapshot.get().getPartition());
-                startOffset = snapshot.get().getOffset();
+                startOffset = snapshot.get().getEventOffset();
             } else {
                 topicPartition = new TopicPartition(TOPIC, 0);
                 startOffset = 0;
@@ -96,7 +96,7 @@ public class ReplayService {
                     .accountId(accountId)
                     .balance(balance)
                     .snapshotUsed(snapshot.isPresent())
-                    .snapshotOffset(snapshot.map(AccountSnapshot::getOffset).orElse(0L))
+                    .snapshotOffset(snapshot.map(AccountSnapshot::getEventOffset).orElse(0L))
                     .eventsReplayed(eventsReplayed)
                     .replayedAt(date)
                     .build();
@@ -125,7 +125,7 @@ public class ReplayService {
                 .accountId(accountId)
                 .balance(balance)
                 .partition(partition)
-                .offset(offset)
+                .eventOffset(offset)
                 .snapshotTime(LocalDateTime.now())
                 .build();
         snapshotRepository.save(snapshot);
@@ -136,7 +136,7 @@ public class ReplayService {
         try (KafkaConsumer<String, TransactionExecutedEvent> consumer = createConsumer()) {
             TopicPartition topicPartition = new TopicPartition(TOPIC, snapshot.getPartition());
             consumer.assign(List.of(topicPartition));
-            consumer.seek(topicPartition, snapshot.getOffset());
+            consumer.seek(topicPartition, snapshot.getEventOffset());
             BigDecimal balance = snapshot.getBalance();
 
             outer:

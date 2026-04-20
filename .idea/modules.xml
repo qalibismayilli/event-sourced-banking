@@ -3,6 +3,8 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/account-service.main.iml" filepath="$PROJECT_DIR$/.idea/modules/account-service.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/notification-service.main.iml" filepath="$PROJECT_DIR$/.idea/modules/notification-service.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/replay-service.main.iml" filepath="$PROJECT_DIR$/.idea/modules/replay-service.main.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/shared-events.main.iml" filepath="$PROJECT_DIR$/.idea/modules/shared-events.main.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/transaction-service.main.iml" filepath="$PROJECT_DIR$/.idea/modules/transaction-service.main.iml" />
     </modules>
