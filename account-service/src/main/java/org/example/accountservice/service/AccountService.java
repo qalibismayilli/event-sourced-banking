@@ -6,7 +6,9 @@ import org.example.accountservice.dto.AccountResponseDto;
 import org.example.accountservice.kafka.AccountEventPublisher;
 import org.example.accountservice.model.Account;
 import org.example.accountservice.repository.AccountRepository;
+import org.example.sharedevents.event.TransactionExecutedEvent;
 import org.example.sharedevents.util.AccountStatus;
+import org.example.sharedevents.util.TransactionType;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -68,28 +70,42 @@ public class AccountService {
     }
 
     @Transactional
-    public AccountResponseDto updateBalance(@NotNull org.example.sharedevents.event.TransactionExecutedEvent event) {
+    public AccountResponseDto updateBalance(@NotNull TransactionExecutedEvent event) {
+
         Account account = getOriginalAccount(event.getAccountId());
 
-        org.example.sharedevents.util.TransactionType type = event.getType();
-        switch (type) {
-            case DEPOSIT:
+        switch (event.getType()) {
+
+            case DEPOSIT -> {
                 account.setBalance(account.getBalance().add(event.getAmount()));
-                accountRepository.save(account);
-                return mapToResponse(account);
-            case WITHDRAW:
+            }
+
+            case WITHDRAW -> {
+                validateSufficientBalance(account, event.getAmount());
                 account.setBalance(account.getBalance().subtract(event.getAmount()));
-                accountRepository.save(account);
-                return mapToResponse(account);
-            case TRANSFER:
+            }
+
+            case TRANSFER -> {
                 Account toAccount = getOriginalAccount(event.getToAccountId());
+
+                validateSufficientBalance(account, event.getAmount());
+
                 account.setBalance(account.getBalance().subtract(event.getAmount()));
                 toAccount.setBalance(toAccount.getBalance().add(event.getAmount()));
-                accountRepository.save(account);
-                accountRepository.save(toAccount);
-                return mapToResponse(account);
-            default:
-                throw new RuntimeException("Unknown transaction type: " + type);
+
+                accountRepository.save(toAccount); // əvvəl bunu save etmək daha safe-dir
+            }
+
+            default -> throw new RuntimeException("Unknown transaction type: " + event.getType());
+        }
+
+        accountRepository.save(account);
+        return mapToResponse(account);
+    }
+
+    private void validateSufficientBalance(Account account, BigDecimal amount) {
+        if (account.getBalance().compareTo(amount) < 0) {
+            throw new RuntimeException("Insufficient balance");
         }
     }
 

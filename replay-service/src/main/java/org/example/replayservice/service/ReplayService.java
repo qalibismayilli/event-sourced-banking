@@ -64,7 +64,7 @@ public class ReplayService {
 
             if (snapshot.isPresent()) {
                 topicPartition = new TopicPartition(TOPIC, snapshot.get().getPartition());
-                startOffset = snapshot.get().getEventOffset();
+                startOffset = snapshot.get().getEventOffset()+1;
             } else {
                 topicPartition = new TopicPartition(TOPIC, 0);
                 startOffset = 0;
@@ -76,7 +76,6 @@ public class ReplayService {
             BigDecimal balance = snapshot.map(AccountSnapshot::getBalance).orElse(BigDecimal.ZERO);
             int eventsReplayed = 0;
 
-            outer:
             while (true) {
                 ConsumerRecords<String, TransactionExecutedEvent> records = consumer.poll(Duration.ofMillis(500));
                 if (records.isEmpty()) break;
@@ -85,7 +84,7 @@ public class ReplayService {
                     TransactionExecutedEvent event = record.value();
 
                     if (!event.getAccountId().equals(accountId)) continue;
-                    if (event.getCreatedDate().isAfter(date)) break outer;
+                    if (event.getCreatedDate().isAfter(date)) continue ;
 
                     balance = applyEvent(balance, event, accountId);
                     eventsReplayed++;
@@ -136,7 +135,7 @@ public class ReplayService {
         try (KafkaConsumer<String, TransactionExecutedEvent> consumer = createConsumer()) {
             TopicPartition topicPartition = new TopicPartition(TOPIC, snapshot.getPartition());
             consumer.assign(List.of(topicPartition));
-            consumer.seek(topicPartition, snapshot.getEventOffset());
+            consumer.seek(topicPartition, snapshot.getEventOffset()+1);
             BigDecimal balance = snapshot.getBalance();
 
             outer:
