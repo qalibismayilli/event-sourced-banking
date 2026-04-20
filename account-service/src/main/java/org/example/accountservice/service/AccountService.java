@@ -58,7 +58,7 @@ public class AccountService {
         Account account = getOriginalAccount(accountId);
         account.setStatus(AccountStatus.ACTIVE);
         Account saved = accountRepository.save(account);
-        accountEventPublisher.publishAccountFrozenEvent(saved);
+        accountEventPublisher.publishAccountActivatedEvent(saved);
         return mapToResponse(saved);
     }
 

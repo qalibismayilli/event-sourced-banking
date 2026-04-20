@@ -24,6 +24,9 @@ public class KafkaConfig {
     public static final String ACCOUNT_CREATED_TOPIC = "account-created-events-topic";
     public static final String ACCOUNT_CLOSED_TOPIC = "account-closed-events-topic";
     public static final String ACCOUNT_FROZEN_TOPIC = "account-frozen-events-topic";
+    public static final String ACCOUNT_ACTIVATED_TOPIC = "account-activated-events-topic";
+
+
 
     private Map<String,Object> producerConfigs(){
         Map<String,Object> config =new HashMap<>();
@@ -90,6 +93,15 @@ public class KafkaConfig {
     @Bean
     public NewTopic newTopic3() {
         return TopicBuilder.name(ACCOUNT_FROZEN_TOPIC)
+                .partitions(3)
+                .replicas(3)
+                .configs(Map.of("min.insync.replicas", "2"))
+                .build();
+    }
+
+    @Bean
+    public NewTopic newTopic4() {
+        return TopicBuilder.name(ACCOUNT_ACTIVATED_TOPIC)
                 .partitions(3)
                 .replicas(3)
                 .configs(Map.of("min.insync.replicas", "2"))

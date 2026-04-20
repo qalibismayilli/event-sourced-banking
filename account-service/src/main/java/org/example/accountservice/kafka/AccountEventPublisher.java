@@ -57,4 +57,16 @@ public class AccountEventPublisher {
                 event
         );
     }
+
+    public void publishAccountActivatedEvent(Account account) {
+        AccountFrozenEvent event = new AccountFrozenEvent(
+                account.getAccountId(),
+                LocalDateTime.now()
+        );
+        kafkaTemplate.send(
+                KafkaConfig.ACCOUNT_ACTIVATED_TOPIC,
+                account.getAccountId().toString(),
+                event
+        );
+    }
 }
