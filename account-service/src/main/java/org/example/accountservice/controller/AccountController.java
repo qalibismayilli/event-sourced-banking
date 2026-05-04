@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/v1/accounts")
+@RequestMapping("/v1/account")
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class AccountController {
 
