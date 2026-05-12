@@ -14,9 +14,9 @@ public class OutboxProcessor {
     private final OutboxRepository outboxRepository;
     private final OutboxPublisher publisher;
 
-    public void process(){
+    public void processPending() {
         List<OutboxMessage> messages = outboxRepository.findAndMarkAsProcessing(OutboxEventStatus.PENDING);
-        if(messages.isEmpty()){
+        if (messages.isEmpty()) {
             return;
         }
         messages.forEach(message -> {
@@ -24,10 +24,31 @@ public class OutboxProcessor {
                 publisher.publish(message);
                 outboxRepository.updateStatus(message.getId(), OutboxEventStatus.COMPLETED);
             } catch (Exception e) {
-                outboxRepository.updateStatus(message.getId(), OutboxEventStatus.CANCELLED);
+                if (message.getRetryCount() < 3) {
+                    outboxRepository.incrementRetryAndUpdateStatus(message.getId(), OutboxEventStatus.PENDING);
+                } else {
+                    outboxRepository.incrementRetryAndUpdateStatus(message.getId(), OutboxEventStatus.FAILED);
+                }
             }
         });
+    }
 
-
+    public void processFailed() {
+        List<OutboxMessage> messages = outboxRepository.findAndMarkAsProcessing(OutboxEventStatus.FAILED);
+        if (messages.isEmpty()) {
+            return;
+        }
+        messages.forEach(message -> {
+            try {
+                publisher.publish(message);
+                outboxRepository.updateStatus(message.getId(), OutboxEventStatus.COMPLETED);
+            } catch (Exception e) {
+                if (message.getRetryCount() < 10) {
+                    outboxRepository.incrementRetryAndUpdateStatus(message.getId(), OutboxEventStatus.FAILED);
+                } else {
+                    outboxRepository.incrementRetryAndUpdateStatus(message.getId(), OutboxEventStatus.CANCELLED);
+                }
+            }
+        });
     }
 }

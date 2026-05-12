@@ -10,8 +10,13 @@ import org.springframework.stereotype.Component;
 public class OutboxScheduler {
     private final OutboxProcessor outboxProcessor;
 
-    @Scheduled(fixedDelay = 1000)
-    public void scheduler(){
-        outboxProcessor.process();
+    @Scheduled(fixedDelay = 5000)
+    public void firstScheduler() {
+        outboxProcessor.processPending();
+    }
+
+    @Scheduled(fixedDelay = 600000)
+    public void secondScheduler() {
+        outboxProcessor.processFailed();
     }
 }

@@ -1,5 +1,5 @@
 package org.example.accountservice.outbox.model;
 
 public enum OutboxEventStatus {
-    PENDING, PROCESSING, COMPLETED, CANCELLED
+    PENDING, PROCESSING, COMPLETED, FAILED, CANCELLED
 }

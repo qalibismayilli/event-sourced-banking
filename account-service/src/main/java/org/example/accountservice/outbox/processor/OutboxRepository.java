@@ -15,7 +15,7 @@ public interface OutboxRepository extends JpaRepository<OutboxMessage, UUID> {
     @Modifying
     @Query(value = """
     UPDATE outbox_messages 
-    SET status = 'PROCESSING'
+    SET status = 'PROCESSING' 
     WHERE id IN (
         SELECT id FROM outbox_messages
         WHERE status = :status
@@ -35,4 +35,13 @@ public interface OutboxRepository extends JpaRepository<OutboxMessage, UUID> {
     """, nativeQuery = true
     )
     void updateStatus(@Param("id") UUID id ,@Param("status") OutboxEventStatus status);
+
+
+    @Modifying
+    @Query(value = """
+    UPDATE outbox_messages
+    SET retry_count = retry_count + 1, status = :status
+    WHERE id = :id
+    """, nativeQuery = true)
+    void incrementRetryAndUpdateStatus(@Param("id") UUID id, @Param("status") OutboxEventStatus status);
 }
