@@ -24,9 +24,6 @@ public class KafkaConfig {
     public static final String ACCOUNT_CREATED_TOPIC = "account-created-events-topic";
     public static final String ACCOUNT_CLOSED_TOPIC = "account-closed-events-topic";
     public static final String ACCOUNT_FROZEN_TOPIC = "account-frozen-events-topic";
-    public static final String ACCOUNT_ACTIVATED_TOPIC = "account-activated-events-topic";
-
-
 
     private Map<String,Object> producerConfigs(){
         Map<String,Object> config =new HashMap<>();

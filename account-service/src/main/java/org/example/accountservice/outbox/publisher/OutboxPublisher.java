@@ -10,14 +10,12 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
 import tools.jackson.databind.ObjectMapper;
 
-
 @Component
 @RequiredArgsConstructor
 public class OutboxPublisher {
 
     private final ObjectMapper objectMapper;
     private final KafkaTemplate<String, Object> kafkaTemplate;
-
 
     public void publish(OutboxMessage message) {
         switch(message.getEventType()) {

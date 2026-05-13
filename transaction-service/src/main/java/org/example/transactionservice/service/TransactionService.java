@@ -3,23 +3,33 @@ package org.example.transactionservice.service;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.example.sharedevents.event.TransactionExecutedEvent;
 import org.example.sharedevents.util.TransactionStatus;
 import org.example.sharedevents.util.TransactionType;
 import org.example.transactionservice.dto.TransactionRequestDto;
 import org.example.transactionservice.dto.TransactionResponseDto;
 import org.example.transactionservice.kafka.TransactionEventPublisher;
 import org.example.transactionservice.model.Transaction;
+import org.example.transactionservice.outbox.model.EventType;
+import org.example.transactionservice.outbox.model.OutboxEventStatus;
+import org.example.transactionservice.outbox.model.OutboxMessage;
+import org.example.transactionservice.outbox.service.OutboxService;
 import org.example.transactionservice.repository.TransactionRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import tools.jackson.databind.ObjectMapper;
 
 @Service
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class TransactionService {
 
-    TransactionRepository transactionRepository;
-    TransactionEventPublisher transactionEventPublisher;
+    private final TransactionRepository transactionRepository;
+    private final TransactionEventPublisher transactionEventPublisher;
+    private final ObjectMapper objectMapper;
+    private final OutboxService outboxService;
 
+    @Transactional
     public TransactionResponseDto deposit(TransactionRequestDto request) {
         Transaction transaction = Transaction.builder()
                 .accountId(request.getAccountId())
@@ -28,12 +38,29 @@ public class TransactionService {
                 .status(TransactionStatus.SUCCESS)
                 .description(request.getDescription())
                 .build();
+        TransactionExecutedEvent event = new TransactionExecutedEvent(
+                transaction.getTransactionId(),
+                transaction.getAccountId(),
+                transaction.getToAccountId(),
+                transaction.getAmount(),
+                transaction.getType(),
+                transaction.getStatus(),
+                transaction.getCreatedDate()
+        );
+        OutboxMessage outboxMessage = OutboxMessage
+                .builder()
+                .eventType(EventType.TRANSACTION_EXECUTED)
+                .payload(objectMapper.writeValueAsString(event))
+                .status(OutboxEventStatus.PENDING)
+                .retryCount(0)
+                .build();
 
         Transaction saved = transactionRepository.save(transaction);
-        transactionEventPublisher.publishTransactionExecutedEvent(saved);
+        outboxService.save(outboxMessage);
         return mapToResponse(saved);
     }
 
+    @Transactional
     public TransactionResponseDto withdraw(TransactionRequestDto request) {
         Transaction transaction = Transaction.builder()
                 .accountId(request.getAccountId())
@@ -42,12 +69,28 @@ public class TransactionService {
                 .description(request.getDescription())
                 .status(TransactionStatus.SUCCESS)
                 .build();
-
+        TransactionExecutedEvent event = new TransactionExecutedEvent(
+                transaction.getTransactionId(),
+                transaction.getAccountId(),
+                transaction.getToAccountId(),
+                transaction.getAmount(),
+                transaction.getType(),
+                transaction.getStatus(),
+                transaction.getCreatedDate()
+        );
+        OutboxMessage outboxMessage = OutboxMessage
+                .builder()
+                .eventType(EventType.TRANSACTION_EXECUTED)
+                .payload(objectMapper.writeValueAsString(event))
+                .status(OutboxEventStatus.PENDING)
+                .retryCount(0)
+                .build();
         Transaction saved = transactionRepository.save(transaction);
-        transactionEventPublisher.publishTransactionExecutedEvent(saved);
+        outboxService.save(outboxMessage);
         return mapToResponse(saved);
     }
 
+    @Transactional
     public TransactionResponseDto transfer(TransactionRequestDto request) {
         if (request.getToAccountId() == null) {
             throw new RuntimeException("toAccountId is required for TRANSFER transactions");
@@ -60,9 +103,24 @@ public class TransactionService {
                 .status(TransactionStatus.SUCCESS)
                 .description(request.getDescription())
                 .build();
-
+        TransactionExecutedEvent event = new TransactionExecutedEvent(
+                transaction.getTransactionId(),
+                transaction.getAccountId(),
+                transaction.getToAccountId(),
+                transaction.getAmount(),
+                transaction.getType(),
+                transaction.getStatus(),
+                transaction.getCreatedDate()
+        );
+        OutboxMessage outboxMessage = OutboxMessage
+                .builder()
+                .eventType(EventType.TRANSACTION_EXECUTED)
+                .payload(objectMapper.writeValueAsString(event))
+                .status(OutboxEventStatus.PENDING)
+                .retryCount(0)
+                .build();
         Transaction saved = transactionRepository.save(transaction);
-        transactionEventPublisher.publishTransactionExecutedEvent(saved);
+        outboxService.save(outboxMessage);
         return mapToResponse(saved);
     }
 
