@@ -6,6 +6,7 @@ import org.example.accountservice.outbox.model.OutboxMessage;
 import org.example.accountservice.outbox.publisher.OutboxPublisher;
 import org.example.accountservice.outbox.repository.OutboxRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -15,6 +16,7 @@ public class OutboxProcessor {
     private final OutboxRepository outboxRepository;
     private final OutboxPublisher publisher;
 
+    @Transactional
     public void processPending() {
         List<OutboxMessage> messages = outboxRepository.findAndMarkAsProcessing(OutboxEventStatus.PENDING);
         if (messages.isEmpty()) {
@@ -34,6 +36,7 @@ public class OutboxProcessor {
         });
     }
 
+    @Transactional
     public void processFailed() {
         List<OutboxMessage> messages = outboxRepository.findAndMarkAsProcessing(OutboxEventStatus.FAILED);
         if (messages.isEmpty()) {
