@@ -1,30 +1,34 @@
 package org.example.accountservice.service;
 
 import jakarta.validation.constraints.NotNull;
+import lombok.RequiredArgsConstructor;
 import org.example.accountservice.dto.AccountRequestDto;
 import org.example.accountservice.dto.AccountResponseDto;
-import org.example.accountservice.kafka.AccountEventPublisher;
 import org.example.accountservice.model.Account;
+import org.example.accountservice.outbox.model.EventType;
+import org.example.accountservice.outbox.model.OutboxEventStatus;
+import org.example.accountservice.outbox.model.OutboxMessage;
+import org.example.accountservice.outbox.service.OutboxService;
 import org.example.accountservice.repository.AccountRepository;
+import org.example.sharedevents.event.AccountClosedEvent;
+import org.example.sharedevents.event.AccountCreatedEvent;
+import org.example.sharedevents.event.AccountFrozenEvent;
 import org.example.sharedevents.event.TransactionExecutedEvent;
 import org.example.sharedevents.util.AccountStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Service
+@RequiredArgsConstructor
 public class AccountService {
     private final AccountRepository accountRepository;
-    private final AccountEventPublisher accountEventPublisher;
+    private final OutboxService outboxService;
 
-    public AccountService(AccountRepository accountRepository,
-                          AccountEventPublisher accountEventPublisher) {
-        this.accountRepository = accountRepository;
-        this.accountEventPublisher = accountEventPublisher;
-    }
-
+    @Transactional
     public AccountResponseDto createAccount(AccountRequestDto request) {
         Account account = Account.builder()
                 .ownerName(request.getOwnerName())
@@ -34,32 +38,71 @@ public class AccountService {
                 .status(AccountStatus.ACTIVE)
                 .build();
 
+        AccountCreatedEvent event = new AccountCreatedEvent(
+                account.getAccountId(),
+                account.getOwnerName(),
+                account.getBalance(),
+                account.getCurrency(),
+                account.getStatus(),
+                account.getMonthlyLimit(),
+                account.getCreatedDate()
+        );
+
+        OutboxMessage outboxMessage = OutboxMessage
+                .builder()
+                .eventType(EventType.ACCOUNT_CREATED)
+                .payload(event.toString())
+                .status(OutboxEventStatus.PENDING)
+                .retryCount(0)
+                .build();
+
         Account saved = accountRepository.save(account);
-        accountEventPublisher.publishAccountCreatedEvent(saved);
+        outboxService.save(outboxMessage);
         return mapToResponse(saved);
     }
 
+    @Transactional
     public AccountResponseDto closeAccount(UUID accountId) {
         Account account = getOriginalAccount(accountId);
         account.setStatus(AccountStatus.CLOSED);
+        AccountClosedEvent event = new AccountClosedEvent(
+                account.getAccountId(),
+                LocalDateTime.now()
+        );
+
+        OutboxMessage outboxMessage = OutboxMessage
+                .builder()
+                .eventType(EventType.ACCOUNT_CLOSED)
+                .payload(event.toString())
+                .status(OutboxEventStatus.PENDING)
+                .retryCount(0)
+                .build();
+
         Account saved = accountRepository.save(account);
-        accountEventPublisher.publishAccountClosedEvent(saved);
+        outboxService.save(outboxMessage);
         return mapToResponse(saved);
     }
 
+    @Transactional
     public AccountResponseDto freezeAccount(UUID accountId) {
         Account account = getOriginalAccount(accountId);
         account.setStatus(AccountStatus.FROZEN);
-        Account saved = accountRepository.save(account);
-        accountEventPublisher.publishAccountFrozenEvent(saved);
-        return mapToResponse(saved);
-    }
 
-    public AccountResponseDto activateAccount(UUID accountId) {
-        Account account = getOriginalAccount(accountId);
-        account.setStatus(AccountStatus.ACTIVE);
+        AccountFrozenEvent event = new AccountFrozenEvent(
+                account.getAccountId(),
+                LocalDateTime.now()
+        );
+
+        OutboxMessage outboxMessage = OutboxMessage
+                .builder()
+                .eventType(EventType.ACCOUNT_FROZEN)
+                .payload(event.toString())
+                .status(OutboxEventStatus.PENDING)
+                .retryCount(0)
+                .build();
+
         Account saved = accountRepository.save(account);
-        accountEventPublisher.publishAccountActivatedEvent(saved);
+        outboxService.save(outboxMessage);
         return mapToResponse(saved);
     }
 
@@ -92,7 +135,7 @@ public class AccountService {
                 account.setBalance(account.getBalance().subtract(event.getAmount()));
                 toAccount.setBalance(toAccount.getBalance().add(event.getAmount()));
 
-                accountRepository.save(toAccount); // əvvəl bunu save etmək daha safe-dir
+                accountRepository.save(toAccount);
             }
 
             default -> throw new RuntimeException("Unknown transaction type: " + event.getType());

@@ -1,9 +1,9 @@
 package org.example.accountservice.outbox.model;
 
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Data;
+import lombok.*;
 import lombok.experimental.FieldDefaults;
+import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UuidGenerator;
 
 import java.time.LocalDateTime;
@@ -13,19 +13,15 @@ import java.util.UUID;
 @Table(name = "outbox_messages")
 @Data
 @FieldDefaults(level = AccessLevel.PRIVATE)
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class OutboxMessage {
 
     @Id
     @GeneratedValue
     @UuidGenerator(style = UuidGenerator.Style.RANDOM)
     UUID id;
-
-    @Enumerated(EnumType.STRING)
-    @Column(name = "aggregate_type")
-    AggregateType aggregateType;
-
-    @Column(name = "aggregate_id")
-    UUID aggregateId;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "event_type")
@@ -44,6 +40,7 @@ public class OutboxMessage {
     String errorMessage;
 
     @Column(name = "created_date")
+    @CreationTimestamp
     LocalDateTime createdDate;
 
     @Column(name = "processed_date")

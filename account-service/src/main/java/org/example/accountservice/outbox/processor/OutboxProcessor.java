@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import org.example.accountservice.outbox.model.OutboxEventStatus;
 import org.example.accountservice.outbox.model.OutboxMessage;
 import org.example.accountservice.outbox.publisher.OutboxPublisher;
+import org.example.accountservice.outbox.repository.OutboxRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

@@ -1,4 +1,4 @@
-package org.example.accountservice.outbox.processor;
+package org.example.accountservice.outbox.repository;
 
 import org.example.accountservice.outbox.model.OutboxEventStatus;
 import org.example.accountservice.outbox.model.OutboxMessage;
