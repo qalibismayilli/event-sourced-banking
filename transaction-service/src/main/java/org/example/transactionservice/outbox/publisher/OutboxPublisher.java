@@ -1,16 +1,12 @@
 package org.example.transactionservice.outbox.publisher;
 
 import lombok.RequiredArgsConstructor;
-import org.example.sharedevents.event.AccountClosedEvent;
-import org.example.sharedevents.event.AccountCreatedEvent;
-import org.example.sharedevents.event.AccountFrozenEvent;
 import org.example.sharedevents.event.TransactionExecutedEvent;
 import org.example.transactionservice.config.KafkaConfig;
 import org.example.transactionservice.outbox.model.OutboxMessage;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
 import tools.jackson.databind.ObjectMapper;
-
 
 @Component
 @RequiredArgsConstructor

@@ -8,7 +8,6 @@ import org.example.sharedevents.util.TransactionStatus;
 import org.example.sharedevents.util.TransactionType;
 import org.example.transactionservice.dto.TransactionRequestDto;
 import org.example.transactionservice.dto.TransactionResponseDto;
-import org.example.transactionservice.kafka.TransactionEventPublisher;
 import org.example.transactionservice.model.Transaction;
 import org.example.transactionservice.outbox.model.EventType;
 import org.example.transactionservice.outbox.model.OutboxEventStatus;
@@ -25,7 +24,6 @@ import tools.jackson.databind.ObjectMapper;
 public class TransactionService {
 
     private final TransactionRepository transactionRepository;
-    private final TransactionEventPublisher transactionEventPublisher;
     private final ObjectMapper objectMapper;
     private final OutboxService outboxService;
 
@@ -38,23 +36,7 @@ public class TransactionService {
                 .status(TransactionStatus.SUCCESS)
                 .description(request.getDescription())
                 .build();
-        TransactionExecutedEvent event = new TransactionExecutedEvent(
-                transaction.getTransactionId(),
-                transaction.getAccountId(),
-                transaction.getToAccountId(),
-                transaction.getAmount(),
-                transaction.getType(),
-                transaction.getStatus(),
-                transaction.getCreatedDate()
-        );
-        OutboxMessage outboxMessage = OutboxMessage
-                .builder()
-                .eventType(EventType.TRANSACTION_EXECUTED)
-                .payload(objectMapper.writeValueAsString(event))
-                .status(OutboxEventStatus.PENDING)
-                .retryCount(0)
-                .build();
-
+        OutboxMessage outboxMessage = buildOutboxMessage(transaction);
         Transaction saved = transactionRepository.save(transaction);
         outboxService.save(outboxMessage);
         return mapToResponse(saved);
@@ -69,22 +51,7 @@ public class TransactionService {
                 .description(request.getDescription())
                 .status(TransactionStatus.SUCCESS)
                 .build();
-        TransactionExecutedEvent event = new TransactionExecutedEvent(
-                transaction.getTransactionId(),
-                transaction.getAccountId(),
-                transaction.getToAccountId(),
-                transaction.getAmount(),
-                transaction.getType(),
-                transaction.getStatus(),
-                transaction.getCreatedDate()
-        );
-        OutboxMessage outboxMessage = OutboxMessage
-                .builder()
-                .eventType(EventType.TRANSACTION_EXECUTED)
-                .payload(objectMapper.writeValueAsString(event))
-                .status(OutboxEventStatus.PENDING)
-                .retryCount(0)
-                .build();
+        OutboxMessage outboxMessage = buildOutboxMessage(transaction);
         Transaction saved = transactionRepository.save(transaction);
         outboxService.save(outboxMessage);
         return mapToResponse(saved);
@@ -103,6 +70,13 @@ public class TransactionService {
                 .status(TransactionStatus.SUCCESS)
                 .description(request.getDescription())
                 .build();
+        OutboxMessage outboxMessage = buildOutboxMessage(transaction);
+        Transaction saved = transactionRepository.save(transaction);
+        outboxService.save(outboxMessage);
+        return mapToResponse(saved);
+    }
+
+    private OutboxMessage buildOutboxMessage(Transaction transaction) {
         TransactionExecutedEvent event = new TransactionExecutedEvent(
                 transaction.getTransactionId(),
                 transaction.getAccountId(),
@@ -112,16 +86,12 @@ public class TransactionService {
                 transaction.getStatus(),
                 transaction.getCreatedDate()
         );
-        OutboxMessage outboxMessage = OutboxMessage
-                .builder()
+        return OutboxMessage.builder()
                 .eventType(EventType.TRANSACTION_EXECUTED)
                 .payload(objectMapper.writeValueAsString(event))
                 .status(OutboxEventStatus.PENDING)
                 .retryCount(0)
                 .build();
-        Transaction saved = transactionRepository.save(transaction);
-        outboxService.save(outboxMessage);
-        return mapToResponse(saved);
     }
 
     private TransactionResponseDto mapToResponse(Transaction transaction) {
