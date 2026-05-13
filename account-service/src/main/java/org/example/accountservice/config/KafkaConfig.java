@@ -98,13 +98,4 @@ public class KafkaConfig {
                 .configs(Map.of("min.insync.replicas", "2"))
                 .build();
     }
-
-    @Bean
-    public NewTopic newTopic4() {
-        return TopicBuilder.name(ACCOUNT_ACTIVATED_TOPIC)
-                .partitions(3)
-                .replicas(3)
-                .configs(Map.of("min.insync.replicas", "2"))
-                .build();
-    }
 }

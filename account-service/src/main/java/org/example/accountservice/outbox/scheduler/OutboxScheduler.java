@@ -11,12 +11,12 @@ public class OutboxScheduler {
     private final OutboxProcessor outboxProcessor;
 
     @Scheduled(fixedDelay = 5000)
-    public void firstScheduler() {
+    public void schedulePending() {
         outboxProcessor.processPending();
     }
 
     @Scheduled(fixedDelay = 600000)
-    public void secondScheduler() {
+    public void scheduleFailed() {
         outboxProcessor.processFailed();
     }
 }

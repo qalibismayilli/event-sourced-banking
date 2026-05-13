@@ -17,6 +17,7 @@ import org.example.sharedevents.event.TransactionExecutedEvent;
 import org.example.sharedevents.util.AccountStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import tools.jackson.databind.ObjectMapper;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -27,6 +28,7 @@ import java.util.UUID;
 public class AccountService {
     private final AccountRepository accountRepository;
     private final OutboxService outboxService;
+    private final ObjectMapper objectMapper;
 
     @Transactional
     public AccountResponseDto createAccount(AccountRequestDto request) {
@@ -37,7 +39,6 @@ public class AccountService {
                 .balance(BigDecimal.ZERO)
                 .status(AccountStatus.ACTIVE)
                 .build();
-
         AccountCreatedEvent event = new AccountCreatedEvent(
                 account.getAccountId(),
                 account.getOwnerName(),
@@ -47,15 +48,13 @@ public class AccountService {
                 account.getMonthlyLimit(),
                 account.getCreatedDate()
         );
-
         OutboxMessage outboxMessage = OutboxMessage
                 .builder()
                 .eventType(EventType.ACCOUNT_CREATED)
-                .payload(event.toString())
+                .payload(objectMapper.writeValueAsString(event))
                 .status(OutboxEventStatus.PENDING)
                 .retryCount(0)
                 .build();
-
         Account saved = accountRepository.save(account);
         outboxService.save(outboxMessage);
         return mapToResponse(saved);
@@ -69,15 +68,13 @@ public class AccountService {
                 account.getAccountId(),
                 LocalDateTime.now()
         );
-
         OutboxMessage outboxMessage = OutboxMessage
                 .builder()
                 .eventType(EventType.ACCOUNT_CLOSED)
-                .payload(event.toString())
+                .payload(objectMapper.writeValueAsString(event))
                 .status(OutboxEventStatus.PENDING)
                 .retryCount(0)
                 .build();
-
         Account saved = accountRepository.save(account);
         outboxService.save(outboxMessage);
         return mapToResponse(saved);
@@ -87,20 +84,17 @@ public class AccountService {
     public AccountResponseDto freezeAccount(UUID accountId) {
         Account account = getOriginalAccount(accountId);
         account.setStatus(AccountStatus.FROZEN);
-
         AccountFrozenEvent event = new AccountFrozenEvent(
                 account.getAccountId(),
                 LocalDateTime.now()
         );
-
         OutboxMessage outboxMessage = OutboxMessage
                 .builder()
                 .eventType(EventType.ACCOUNT_FROZEN)
-                .payload(event.toString())
+                .payload(objectMapper.writeValueAsString(event))
                 .status(OutboxEventStatus.PENDING)
                 .retryCount(0)
                 .build();
-
         Account saved = accountRepository.save(account);
         outboxService.save(outboxMessage);
         return mapToResponse(saved);
@@ -113,34 +107,24 @@ public class AccountService {
 
     @Transactional
     public AccountResponseDto updateBalance(@NotNull TransactionExecutedEvent event) {
-
         Account account = getOriginalAccount(event.getAccountId());
-
         switch (event.getType()) {
-
             case DEPOSIT -> {
                 account.setBalance(account.getBalance().add(event.getAmount()));
             }
-
             case WITHDRAW -> {
                 validateSufficientBalance(account, event.getAmount());
                 account.setBalance(account.getBalance().subtract(event.getAmount()));
             }
-
             case TRANSFER -> {
                 Account toAccount = getOriginalAccount(event.getToAccountId());
-
                 validateSufficientBalance(account, event.getAmount());
-
                 account.setBalance(account.getBalance().subtract(event.getAmount()));
                 toAccount.setBalance(toAccount.getBalance().add(event.getAmount()));
-
                 accountRepository.save(toAccount);
             }
-
             default -> throw new RuntimeException("Unknown transaction type: " + event.getType());
         }
-
         accountRepository.save(account);
         return mapToResponse(account);
     }
