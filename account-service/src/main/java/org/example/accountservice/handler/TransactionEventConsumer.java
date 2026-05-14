@@ -18,7 +18,6 @@ public class TransactionEventConsumer {
     private static final Logger log = LoggerFactory.getLogger(TransactionEventConsumer.class);
 
     private final AccountService accountService;
-    private final ObjectMapper objectMapper;
 
     @KafkaListener(topics = "transaction-executed-events-topic")
     public void handleTransactionExecuted(@Payload TransactionExecutedEvent event) {
