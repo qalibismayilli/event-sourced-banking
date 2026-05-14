@@ -39,14 +39,15 @@ public class AccountService {
                 .balance(BigDecimal.ZERO)
                 .status(AccountStatus.ACTIVE)
                 .build();
+        Account saved = accountRepository.saveAndFlush(account);
         AccountCreatedEvent event = new AccountCreatedEvent(
-                account.getAccountId(),
-                account.getOwnerName(),
-                account.getBalance(),
-                account.getCurrency(),
-                account.getStatus(),
-                account.getMonthlyLimit(),
-                account.getCreatedDate()
+                saved.getAccountId(),
+                saved.getOwnerName(),
+                saved.getBalance(),
+                saved.getCurrency(),
+                saved.getStatus(),
+                saved.getMonthlyLimit(),
+                saved.getCreatedDate()
         );
         OutboxMessage outboxMessage = OutboxMessage
                 .builder()
@@ -55,7 +56,6 @@ public class AccountService {
                 .status(OutboxEventStatus.PENDING)
                 .retryCount(0)
                 .build();
-        Account saved = accountRepository.save(account);
         outboxService.save(outboxMessage);
         return mapToResponse(saved);
     }

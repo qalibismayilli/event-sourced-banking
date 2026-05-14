@@ -28,9 +28,17 @@ public class OutboxProcessor {
                 outboxRepository.updateStatus(message.getId(), OutboxEventStatus.COMPLETED);
             } catch (Exception e) {
                 if (message.getRetryCount() < 3) {
-                    outboxRepository.incrementRetryAndUpdateStatus(message.getId(), OutboxEventStatus.PENDING);
+                    outboxRepository.incrementRetryAndUpdateStatusAndSetErrorMessage(
+                            message.getId(),
+                            OutboxEventStatus.PENDING,
+                            e.getMessage()
+                    );
                 } else {
-                    outboxRepository.incrementRetryAndUpdateStatus(message.getId(), OutboxEventStatus.FAILED);
+                    outboxRepository.incrementRetryAndUpdateStatusAndSetErrorMessage(
+                            message.getId(),
+                            OutboxEventStatus.FAILED,
+                            e.getMessage()
+                    );
                 }
             }
         });
@@ -48,9 +56,17 @@ public class OutboxProcessor {
                 outboxRepository.updateStatus(message.getId(), OutboxEventStatus.COMPLETED);
             } catch (Exception e) {
                 if (message.getRetryCount() < 10) {
-                    outboxRepository.incrementRetryAndUpdateStatus(message.getId(), OutboxEventStatus.FAILED);
+                    outboxRepository.incrementRetryAndUpdateStatusAndSetErrorMessage(
+                            message.getId(),
+                            OutboxEventStatus.FAILED,
+                            e.getMessage()
+                    );
                 } else {
-                    outboxRepository.incrementRetryAndUpdateStatus(message.getId(), OutboxEventStatus.CANCELLED);
+                    outboxRepository.incrementRetryAndUpdateStatusAndSetErrorMessage(
+                            message.getId(),
+                            OutboxEventStatus.CANCELLED,
+                            e.getMessage()
+                    );
                 }
             }
         });

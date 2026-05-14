@@ -40,8 +40,10 @@ public interface OutboxRepository extends JpaRepository<OutboxMessage, UUID> {
     @Modifying
     @Query(value = """
     UPDATE outbox_messages
-    SET retry_count = retry_count + 1, status = :status
+    SET retry_count = retry_count + 1, status = :status, error_message = :errorMessage
     WHERE id = :id
     """, nativeQuery = true)
-    void incrementRetryAndUpdateStatus(@Param("id") UUID id, @Param("status") OutboxEventStatus status);
+    void incrementRetryAndUpdateStatusAndSetErrorMessage(@Param("id") UUID id,
+                                                         @Param("status") OutboxEventStatus status,
+                                                         @Param("errorMessage")String errorMessage);
 }

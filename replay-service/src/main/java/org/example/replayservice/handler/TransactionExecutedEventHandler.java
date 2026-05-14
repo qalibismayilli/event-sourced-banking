@@ -1,4 +1,4 @@
-package org.example.replayservice.hadler;
+package org.example.replayservice.handler;
 
 import lombok.RequiredArgsConstructor;
 import org.example.replayservice.service.ReplayService;
