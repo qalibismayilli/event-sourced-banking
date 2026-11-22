@@ -36,8 +36,8 @@ public class TransactionService {
                 .status(TransactionStatus.SUCCESS)
                 .description(request.getDescription())
                 .build();
-        OutboxMessage outboxMessage = buildOutboxMessage(transaction);
         Transaction saved = transactionRepository.save(transaction);
+        OutboxMessage outboxMessage = buildOutboxMessage(saved);
         outboxService.save(outboxMessage);
         return mapToResponse(saved);
     }
@@ -51,8 +51,8 @@ public class TransactionService {
                 .description(request.getDescription())
                 .status(TransactionStatus.SUCCESS)
                 .build();
-        OutboxMessage outboxMessage = buildOutboxMessage(transaction);
         Transaction saved = transactionRepository.save(transaction);
+        OutboxMessage outboxMessage = buildOutboxMessage(saved);
         outboxService.save(outboxMessage);
         return mapToResponse(saved);
     }
@@ -70,8 +70,8 @@ public class TransactionService {
                 .status(TransactionStatus.SUCCESS)
                 .description(request.getDescription())
                 .build();
-        OutboxMessage outboxMessage = buildOutboxMessage(transaction);
         Transaction saved = transactionRepository.save(transaction);
+        OutboxMessage outboxMessage = buildOutboxMessage(saved);
         outboxService.save(outboxMessage);
         return mapToResponse(saved);
     }

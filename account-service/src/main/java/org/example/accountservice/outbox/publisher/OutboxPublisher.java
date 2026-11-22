@@ -10,6 +10,10 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
 import tools.jackson.databind.ObjectMapper;
 
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+
 @Component
 @RequiredArgsConstructor
 public class OutboxPublisher {
@@ -20,38 +24,29 @@ public class OutboxPublisher {
     public void publish(OutboxMessage message) {
         switch(message.getEventType()) {
             case ACCOUNT_CREATED:
-                publishAccountCreatedEvent(objectMapper.convertValue(message.getPayload(), AccountCreatedEvent.class));
+                publishEventAndWait(KafkaConfig.ACCOUNT_CREATED_TOPIC,
+                        objectMapper.convertValue(message.getPayload(), AccountCreatedEvent.class));
                 break;
             case ACCOUNT_CLOSED:
-                publishAccountClosedEvent(objectMapper.convertValue(message.getPayload(), AccountClosedEvent.class));
+                publishEventAndWait(KafkaConfig.ACCOUNT_CLOSED_TOPIC,
+                        objectMapper.convertValue(message.getPayload(), AccountClosedEvent.class));
                 break;
             case ACCOUNT_FROZEN:
-                publishAccountFrozenEvent(objectMapper.convertValue(message.getPayload(), AccountFrozenEvent.class));
+                publishEventAndWait(KafkaConfig.ACCOUNT_FROZEN_TOPIC,
+                        objectMapper.convertValue(message.getPayload(), AccountFrozenEvent.class));
                 break;
         }
     }
 
-    public void publishAccountCreatedEvent(AccountCreatedEvent event) {
-        kafkaTemplate.send(
-                KafkaConfig.ACCOUNT_CREATED_TOPIC,
-                event.getAccountId().toString(),
-                event
-        );
+    private void publishEventAndWait(String topic, Object event) {
+        try {
+            kafkaTemplate.send(topic, event).get(10, TimeUnit.SECONDS);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new IllegalStateException("Interrupted while publishing event", e);
+        } catch (ExecutionException | TimeoutException e) {
+            throw new IllegalStateException("Failed to publish event", e);
+        }
     }
 
-    public void publishAccountClosedEvent(AccountClosedEvent event) {
-        kafkaTemplate.send(
-                KafkaConfig.ACCOUNT_CLOSED_TOPIC,
-                event.getAccountId().toString(),
-                event
-        );
-    }
-
-    public void publishAccountFrozenEvent(AccountFrozenEvent event) {
-        kafkaTemplate.send(
-                KafkaConfig.ACCOUNT_FROZEN_TOPIC,
-                event.getAccountId().toString(),
-                event
-        );
-    }
 }
