@@ -40,7 +40,7 @@ public class ReplayService {
     }
 
     public void processEvent(TransactionExecutedEvent event, int partition, long offset) {
-        snapshotRepository.findByAccountId((event.getAccountId())).ifPresentOrElse(
+        snapshotRepository.findTopByAccountIdOrderByEventOffsetDesc((event.getAccountId())).ifPresentOrElse(
                 snapshot -> {
                     if (offset - snapshot.getEventOffset() >= SNAPSHOT_INTERVAL) {
                         takeSnapshot(event.getAccountId(), calculateBalance(event.getAccountId(), snapshot, offset), partition, offset);

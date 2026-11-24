@@ -10,8 +10,8 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface AccountSnapshotRepository extends JpaRepository<AccountSnapshot, UUID> {
-    Optional<AccountSnapshot> findByAccountId(UUID accountId);
 
+    Optional<AccountSnapshot> findTopByAccountIdOrderByEventOffsetDesc(UUID accountId);
 
     @Query(value = """
             select *from account_snapshots
